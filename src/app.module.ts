@@ -10,6 +10,7 @@ import redisConfig from './config/cache.config';
 import { RedisCacheModule } from './config/cache.module';
 import { LocaleModule } from './Locale/locale.module';
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({

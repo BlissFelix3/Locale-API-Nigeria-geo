@@ -1,6 +1,6 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { SearchService } from './search.service';
-import { ApiKeyAuthGuard } from 'src/auth/key';
+import { SearchService } from './locale-search.service';
+import { ApiKeyAuthGuard } from '../auth/key';
 
 @Controller('search')
 export class SearchController {
@@ -22,6 +22,18 @@ export class SearchController {
   @Get('region')
   async searchRegion(@Query('q') query: string) {
     return this.searchService.searchRegion(query);
+  }
+
+  @UseGuards(ApiKeyAuthGuard)
+  @Get('state/lgas')
+  async searchLgasInState(@Query('q') state: string) {
+    return this.searchService.searchLgasInState(state);
+  }
+
+  @UseGuards(ApiKeyAuthGuard)
+  @Get('region/states')
+  async searchStatesInRegion(@Query('q') region: string) {
+    return this.searchService.searchStatesInRegion(region);
   }
 
   @UseGuards(ApiKeyAuthGuard)
