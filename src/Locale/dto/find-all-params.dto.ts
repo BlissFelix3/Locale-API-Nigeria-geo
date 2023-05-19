@@ -1,26 +1,26 @@
 import { IsOptional, IsNumber, IsString, Min, IsIn } from 'class-validator';
 
 export class FindAllParams {
-  @IsNumber()
+  @IsNumber({}, { message: 'Page must be a number' })
   @IsOptional()
   @Min(1)
   page: number;
 
-  @IsNumber()
+  @IsNumber({}, { message: 'Limit must be a number' })
   @IsOptional()
   @Min(1)
   limit: number;
 
-  @IsString()
+  @IsString({ message: 'Sort Feild must be string' })
   @IsOptional()
   sortField: string;
 
-  @IsString()
+  @IsString({ message: 'Sort Order must be string' })
   @IsOptional()
   @IsIn(['asc', 'desc'])
   sortOrder: string;
 
-  @IsString()
+  @IsString({ message: 'Filter must be string' })
   @IsOptional()
   filter: string;
 }
