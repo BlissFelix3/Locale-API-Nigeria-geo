@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { StateInfo, StateInfoDocument } from '../Locale/locale-info.schema';
+import { StateInfo, StateInfoDocument } from '../../Locale/locale-info.schema';
 import * as fs from 'fs';
 import * as path from 'path';
 

@@ -1,44 +1,80 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { SearchService } from './locale-search.service';
 import { ApiKeyAuthGuard } from '../auth/key';
+import { ApiKey } from '../auth/key';
+import { FindAllParams } from './dto/find-all-params.dto';
+import { CurrentUser } from 'common/decorators';
 
 @Controller('search')
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 
   @UseGuards(ApiKeyAuthGuard)
+  @Get('all')
+  async findAll(
+    @CurrentUser() user: ApiKey,
+    @Query(ValidationPipe) params: FindAllParams,
+  ) {
+    try {
+      return await this.searchService.findAll(params, user._id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @UseGuards(ApiKeyAuthGuard)
   @Get('state')
   async searchState(@Query('q') query: string) {
-    return this.searchService.searchState(query);
+    try {
+      return await this.searchService.searchState(query);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @UseGuards(ApiKeyAuthGuard)
   @Get('lga')
   async searchLga(@Query('q') query: string) {
-    return this.searchService.searchLga(query);
+    try {
+      return await this.searchService.searchLga(query);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @UseGuards(ApiKeyAuthGuard)
   @Get('region')
   async searchRegion(@Query('q') query: string) {
-    return this.searchService.searchRegion(query);
+    try {
+      return await this.searchService.searchRegion(query);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @UseGuards(ApiKeyAuthGuard)
   @Get('state/lgas')
   async searchLgasInState(@Query('q') state: string) {
-    return this.searchService.searchLgasInState(state);
+    try {
+      return await this.searchService.searchLgasInState(state);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @UseGuards(ApiKeyAuthGuard)
   @Get('region/states')
   async searchStatesInRegion(@Query('q') region: string) {
-    return this.searchService.searchStatesInRegion(region);
-  }
-
-  @UseGuards(ApiKeyAuthGuard)
-  @Get('all')
-  async findAll() {
-    return this.searchService.findAll();
+    try {
+      return await this.searchService.searchStatesInRegion(region);
+    } catch (error) {
+      throw error;
+    }
   }
 }

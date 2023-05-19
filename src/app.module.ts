@@ -5,9 +5,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RedisModule } from 'nestjs-redis';
 import { AuthModule } from './auth/auth.module';
-import databaseConfig from './config/database.config';
-import redisConfig from './config/cache.config';
-import { RedisCacheModule } from './config/cache.module';
+import databaseConfig from './common/config/database.config';
+import redisConfig from './common/config/cache.config';
+import { RedisCacheModule } from './common/config/cache.module';
 import { LocaleModule } from './Locale/locale.module';
 
 

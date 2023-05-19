@@ -1,7 +1,7 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ApiKey, ApiKeySchema } from '../auth/key/apikey.model';
-import { ApiKeyService } from '../auth/key/apikey.service';
+import { ApiKey, ApiKeySchema } from '../../auth/key/apikey.model';
+import { ApiKeyService } from '../../auth/key/apikey.service';
 import { ConfigService } from '@nestjs/config';
 
 @Module({
