@@ -5,7 +5,7 @@ export type StateInfoDocument = StateInfo & Document;
 
 @Schema()
 export class StateInfo {
-  @Prop()
+  @Prop({ text: true })
   state: string;
 
   @Prop()
@@ -17,7 +17,7 @@ export class StateInfo {
   @Prop([String])
   senatorial_districts: string[];
 
-  @Prop([String])
+  @Prop({ type: [String], index: 'text' })
   lgas: string[];
 
   @Prop()

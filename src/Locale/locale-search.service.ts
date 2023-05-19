@@ -44,9 +44,15 @@ export class SearchService {
   async findAll(params: FindAllParams) {
     let query = this.stateInfoModel.find();
 
-    // Check for filtering
+    /* Checks for filtering only for state region and lgas */
     if (params.filter) {
-      query = query.where({ $text: { $search: params.filter } });
+      query = query.where({
+        $or: [
+          { state: { $regex: params.filter, $options: 'i' } },
+          { region: { $regex: params.filter, $options: 'i' } },
+          { lgas: { $regex: params.filter, $options: 'i' } },
+        ],
+      });
     }
 
     // Check for sorting
