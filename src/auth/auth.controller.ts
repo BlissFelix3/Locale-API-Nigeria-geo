@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, SignupDto } from './dto';
-import { ApiKeyAuthGuard } from 'common';
+import { ApiKeyAuthGuard } from '../common';
 
 @Controller('auth')
 export class AuthController {
