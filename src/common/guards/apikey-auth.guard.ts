@@ -1,3 +1,4 @@
+/* Middleware guard to authorize requests by key */
 import {
   Injectable,
   CanActivate,

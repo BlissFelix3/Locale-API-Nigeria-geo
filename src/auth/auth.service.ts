@@ -8,6 +8,7 @@ import { ApiKey } from './key';
 export class AuthService {
   constructor(private readonly apiKeyService: ApiKeyService) {}
 
+  /* Validates User by Email and Password */
   async validateUser(email: string, password: string): Promise<ApiKey> {
     const apiKey = await this.apiKeyService.findApiKeyByEmail(email);
     if (
@@ -19,11 +20,13 @@ export class AuthService {
     return null;
   }
 
+  /* Registers user by creating an apiKey */
   async signup(signupDto: SignupDto): Promise<ApiKey> {
     const apiKey = await this.apiKeyService.createApiKey(signupDto);
     return apiKey;
   }
 
+  /* Functionality to login user */
   async login(loginDto: LoginDto): Promise<ApiKey> {
     const apiKey = await this.validateUser(loginDto.email, loginDto.password);
     if (!apiKey) {
@@ -32,6 +35,7 @@ export class AuthService {
     return apiKey;
   }
 
+  /* Verifies api key */
   async validateApiKey(apiKey: string): Promise<boolean> {
     return this.apiKeyService.validateApiKey(apiKey);
   }

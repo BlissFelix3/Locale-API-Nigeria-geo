@@ -18,7 +18,7 @@ export class SearchController {
   @UseGuards(ApiKeyAuthGuard)
   @Get('all')
   async findAll(
-    @CurrentUser() user: ApiKey,
+    @CurrentUser() user: ApiKey, // Gets current user's data
     @Query(ValidationPipe) params: FindAllParams,
   ) {
     try {

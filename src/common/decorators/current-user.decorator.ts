@@ -1,3 +1,4 @@
+/* Checks for Current User */
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 export const CurrentUser = createParamDecorator(

@@ -1,3 +1,4 @@
+/* Global Error Handling for the controllers */
 import { Catch, ArgumentsHost } from '@nestjs/common';
 import {
   ExceptionFilter,

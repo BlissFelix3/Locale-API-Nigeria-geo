@@ -16,6 +16,7 @@ export class SearchService {
     private stateInfoModel: Model<StateInfoDocument>,
   ) {}
 
+  /* Error handling functionality */
   private async findWithRegex(
     field: string,
     query: string,
@@ -37,6 +38,9 @@ export class SearchService {
     return results;
   }
 
+  /* requirement: findall*/
+  // Caches the result for 1 hour (60 minutes * 60 seconds)
+  @CacheTTL(60 * 60)
   async findAll(params: FindAllParams, userId: string) {
     let query = this.stateInfoModel.find({ userId });
 
@@ -64,30 +68,35 @@ export class SearchService {
     return results;
   }
 
+  /* requirement: search specific state */
   @CacheKey('state')
   @CacheTTL(60 * 60)
   async searchState(query: string) {
     return this.findWithRegex('state', query);
   }
 
+  /* requirement: search specific lga */
   @CacheKey('lga')
   @CacheTTL(60 * 60)
   async searchLga(query: string) {
     return this.findWithRegex('lgas', query);
   }
 
+  /* requirement: search specific region */
   @CacheKey('region')
   @CacheTTL(60 * 60)
   async searchRegion(query: string) {
     return this.findWithRegex('region', query);
   }
 
+  /* requirement: search for states with lgas under them */
   @CacheKey('state-lgas')
   @CacheTTL(60 * 60)
   async searchLgasInState(state: string) {
     return this.findWithRegex('state', state, 'lgas');
   }
 
+  /* requirement: search for region with states under them */
   @CacheKey('region-states')
   @CacheTTL(60 * 60)
   async searchStatesInRegion(region: string) {
