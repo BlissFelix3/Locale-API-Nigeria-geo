@@ -7,9 +7,7 @@ import {
 } from '@nestjs/common';
 import { SearchService } from './locale-search.service';
 import { ApiKeyAuthGuard } from '../auth';
-import { ApiKey } from '../auth';
 import { FindAllParams } from './dto';
-import { CurrentUser } from 'common';
 
 @Controller('search')
 export class SearchController {
@@ -17,12 +15,9 @@ export class SearchController {
 
   @UseGuards(ApiKeyAuthGuard)
   @Get('all')
-  async findAll(
-    @CurrentUser() user: ApiKey, // Gets current user's data
-    @Query(ValidationPipe) params: FindAllParams,
-  ) {
+  async findAll(@Query(ValidationPipe) params: FindAllParams) {
     try {
-      return await this.searchService.findAll(params, user._id);
+      return await this.searchService.findAll(params);
     } catch (error) {
       throw error;
     }

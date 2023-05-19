@@ -41,8 +41,8 @@ export class SearchService {
   /* requirement: findall*/
   // Caches the result for 1 hour (60 minutes * 60 seconds)
   @CacheTTL(60 * 60)
-  async findAll(params: FindAllParams, userId: string) {
-    let query = this.stateInfoModel.find({ userId });
+  async findAll(params: FindAllParams) {
+    let query = this.stateInfoModel.find();
 
     // Check for filtering
     if (params.filter) {
@@ -55,9 +55,12 @@ export class SearchService {
       query = query.sort({ [params.sortField]: sortOrder });
     }
 
-    // Check for pagination
-    if (params.page && params.limit) {
-      query = query.skip((params.page - 1) * params.limit).limit(params.limit);
+    // Check for pagination and limits
+    if (params.limit) {
+      query = query.limit(params.limit);
+      if (params.page) {
+        query = query.skip((params.page - 1) * params.limit);
+      }
     }
 
     const results = await query.exec();
