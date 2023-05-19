@@ -77,35 +77,35 @@ export class SearchService {
     return results;
   }
 
-  /* requirement: search specific state */
+  /* requirement: search specific states with state names */
   @CacheKey('state')
   @CacheTTL(60 * 60)
   async searchState(query: string) {
     return this.findWithRegex('state', query);
   }
 
-  /* requirement: search specific lga */
+  /* requirement: search specific lgas with lga name */
   @CacheKey('lga')
   @CacheTTL(60 * 60)
   async searchLga(query: string) {
     return this.findWithRegex('lgas', query);
   }
 
-  /* requirement: search specific region */
+  /* requirement: search specific regions with region name */
   @CacheKey('region')
   @CacheTTL(60 * 60)
   async searchRegion(query: string) {
     return this.findWithRegex('region', query);
   }
 
-  /* requirement: search for states with lgas under them */
+  /* requirement: search for states names showing lgas under them */
   @CacheKey('state-lgas')
   @CacheTTL(60 * 60)
   async searchLgasInState(state: string) {
     return this.findWithRegex('state', state, 'lgas');
   }
 
-  /* requirement: search for region with states under them */
+  /* requirement: search for region names showing states under them */
   @CacheKey('region-states')
   @CacheTTL(60 * 60)
   async searchStatesInRegion(region: string) {
