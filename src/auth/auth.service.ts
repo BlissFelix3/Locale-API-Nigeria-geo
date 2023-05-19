@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ApiKeyService } from './key';
 import { LoginDto } from './dto';
 import { SignupDto } from './dto';
@@ -11,32 +11,44 @@ export class AuthService {
   /* Validates User by Email and Password */
   async validateUser(email: string, password: string): Promise<ApiKey> {
     const apiKey = await this.apiKeyService.findApiKeyByEmail(email);
-    if (
-      apiKey &&
-      (await this.apiKeyService.comparePassword(apiKey, password))
-    ) {
-      return apiKey;
+    if (!apiKey) {
+      throw new NotFoundException('Invalid email or password');
     }
-    return null;
+
+    const isPasswordValid = await this.apiKeyService.comparePassword(apiKey, password);
+    if (!isPasswordValid) {
+      throw new NotFoundException('Invalid email or password');
+    }
+
+    return apiKey;
   }
 
-  /* Registers user by creating an apiKey */
+   /* Registers user by creating an apiKey */
   async signup(signupDto: SignupDto): Promise<ApiKey> {
-    const apiKey = await this.apiKeyService.createApiKey(signupDto);
-    return apiKey;
+    try {
+      const apiKey = await this.apiKeyService.createApiKey(signupDto);
+      return apiKey;
+    } catch (error) {
+      throw new Error('Failed to create API key');
+    }
   }
 
   /* Functionality to login user */
   async login(loginDto: LoginDto): Promise<ApiKey> {
-    const apiKey = await this.validateUser(loginDto.email, loginDto.password);
-    if (!apiKey) {
-      return null;
+    try {
+      const apiKey = await this.validateUser(loginDto.email, loginDto.password);
+      return apiKey;
+    } catch (error) {
+      throw new NotFoundException('Invalid email or password');
     }
-    return apiKey;
   }
 
   /* Verifies api key */
   async validateApiKey(apiKey: string): Promise<boolean> {
-    return this.apiKeyService.validateApiKey(apiKey);
+    const isValid = await this.apiKeyService.validateApiKey(apiKey);
+    if (!isValid) {
+      throw new NotFoundException('Invalid API key');
+    }
+    return isValid;
   }
 }
