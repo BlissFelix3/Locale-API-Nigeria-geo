@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { CacheModule, CacheInterceptor } from '@nestjs/cache-manager';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER } from '@nestjs/core';
+import { GlobalExceptionFilter } from 'common/filter/global-exception.filter';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RedisModule } from 'nestjs-redis';
@@ -9,7 +11,6 @@ import databaseConfig from './common/config/database.config';
 import redisConfig from './common/config/cache.config';
 import { RedisCacheModule } from './common/config/cache.module';
 import { LocaleModule } from './Locale/locale.module';
-
 
 @Module({
   imports: [
@@ -41,6 +42,11 @@ import { LocaleModule } from './Locale/locale.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: CacheInterceptor,
+    },
+
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
     },
   ],
 })
