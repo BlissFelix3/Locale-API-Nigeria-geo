@@ -7,7 +7,7 @@ import { CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { StateInfo, StateInfoDocument } from './locale-info.schema';
-import { FindAllParams } from './dto/find-all-params.dto';
+import { FindAllParams } from './dto';
 
 @Injectable()
 export class SearchService {

@@ -6,10 +6,10 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { SearchService } from './locale-search.service';
-import { ApiKeyAuthGuard } from '../auth/key';
-import { ApiKey } from '../auth/key';
-import { FindAllParams } from './dto/find-all-params.dto';
-import { CurrentUser } from 'common/decorators';
+import { ApiKeyAuthGuard } from '../auth';
+import { ApiKey } from '../auth';
+import { FindAllParams } from './dto';
+import { CurrentUser } from 'common';
 
 @Controller('search')
 export class SearchController {

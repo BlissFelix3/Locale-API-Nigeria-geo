@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ApiKeyService } from './key/apikey.service';
+import { ApiKeyService } from './key';
 import { LoginDto } from './dto';
 import { SignupDto } from './dto';
-import { ApiKey } from './key/apikey.model';
+import { ApiKey } from './key';
 
 @Injectable()
 export class AuthService {
