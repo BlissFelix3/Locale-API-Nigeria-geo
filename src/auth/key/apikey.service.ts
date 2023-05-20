@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ApiKey } from './apikey.model';
 import { Model } from 'mongoose';
-import { SignupDto } from '../dto/signup.dto';
+import { SignupDto } from '../dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -52,7 +52,7 @@ export class ApiKeyService {
     try {
       return this.apiKeyModel.findById(id).exec();
     } catch (error) {
-      throw new NotFoundException('API key not found');
+      throw new NotFoundException(`No key with id ${id}`);
     }
   }
 

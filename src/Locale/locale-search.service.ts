@@ -70,7 +70,7 @@ export class SearchService {
     }
 
     const results = await query.exec();
-    if (!results.length) {
+    if (!results || results.length === 0) {
       throw new NotFoundException(`No results found for given parameters`);
     }
 
