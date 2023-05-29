@@ -23,4 +23,14 @@ export class FindAllParams {
   @IsString({ message: 'Filter must be string' })
   @IsOptional()
   filter: string;
+
+  @IsNumber({}, { message: 'Population Greater Than must be a number' })
+  @IsOptional()
+  @Min(1)
+  populationGt: number;
+
+  @IsNumber({}, { message: 'Population Less Than must be a number' })
+  @IsOptional()
+  @Min(1)
+  populationLt: number;
 }
