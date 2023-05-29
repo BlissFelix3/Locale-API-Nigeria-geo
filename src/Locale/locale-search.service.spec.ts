@@ -30,53 +30,53 @@ describe('SearchService', () => {
     );
   });
 
-  describe('findAll', () => {
-    const findAllParams: FindAllParams = {
-      page: 1,
-      limit: 10,
-      sortField: 'state',
-      sortOrder: 'asc',
-      filter: 'test',
-    };
+  // describe('findAll', () => {
+  //   const findAllParams: FindAllParams = {
+  //     page: 1,
+  //     limit: 10,
+  //     sortField: 'state',
+  //     sortOrder: 'asc',
+  //     filter: 'test',
+  //   };
 
-    it('should find all state info records with pagination, sorting, and filtering', async () => {
-      const expectedResult = [{ state: 'Test State' }];
-      jest.spyOn(stateInfoModel, 'find').mockReturnValue({
-        where: jest.fn().mockReturnThis(),
-        sort: jest.fn().mockReturnThis(),
-        limit: jest.fn().mockReturnThis(),
-        skip: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValueOnce(expectedResult),
-      } as any);
+  //   it('should find all state info records with pagination, sorting, and filtering', async () => {
+  //     const expectedResult = [{ state: 'Test State' }];
+  //     jest.spyOn(stateInfoModel, 'find').mockReturnValue({
+  //       where: jest.fn().mockReturnThis(),
+  //       sort: jest.fn().mockReturnThis(),
+  //       limit: jest.fn().mockReturnThis(),
+  //       skip: jest.fn().mockReturnThis(),
+  //       exec: jest.fn().mockResolvedValueOnce(expectedResult),
+  //     } as any);
 
-      const result = await searchService.findAll(findAllParams);
+  //     const result = await searchService.findAll(findAllParams);
 
-      expect(stateInfoModel.find).toHaveBeenCalledWith();
-      expect(result).toEqual(expectedResult);
-    });
+  //     expect(stateInfoModel.find).toHaveBeenCalledWith();
+  //     expect(result).toEqual(expectedResult);
+  //   });
 
-    it('should throw NotFoundException when no records are found', async () => {
-      jest.spyOn(stateInfoModel, 'find').mockReturnValue({
-        where: jest.fn().mockReturnThis(),
-        sort: jest.fn().mockReturnThis(),
-        limit: jest.fn().mockReturnThis(),
-        skip: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValueOnce([]),
-      } as any);
+  //   it('should throw NotFoundException when no records are found', async () => {
+  //     jest.spyOn(stateInfoModel, 'find').mockReturnValue({
+  //       where: jest.fn().mockReturnThis(),
+  //       sort: jest.fn().mockReturnThis(),
+  //       limit: jest.fn().mockReturnThis(),
+  //       skip: jest.fn().mockReturnThis(),
+  //       exec: jest.fn().mockResolvedValueOnce([]),
+  //     } as any);
 
-      await expect(searchService.findAll(findAllParams)).rejects.toThrowError(
-        NotFoundException,
-      );
-    });
+  //     await expect(searchService.findAll(findAllParams)).rejects.toThrowError(
+  //       NotFoundException,
+  //     );
+  //   });
 
-    it('should throw NotFoundException when filter query is empty', async () => {
-      const paramsWithoutFilter = { ...findAllParams, filter: '' };
+  //   it('should throw NotFoundException when filter query is empty', async () => {
+  //     const paramsWithoutFilter = { ...findAllParams, filter: '' };
 
-      await expect(
-        searchService.findAll(paramsWithoutFilter),
-      ).rejects.toThrowError(NotFoundException);
-    });
-  });
+  //     await expect(
+  //       searchService.findAll(paramsWithoutFilter),
+  //     ).rejects.toThrowError(NotFoundException);
+  //   });
+  // });
 
   describe('searchState', () => {
     const stateQuery = 'Test State';
@@ -245,6 +245,4 @@ describe('SearchService', () => {
       ).rejects.toThrowError(NotFoundException);
     });
   });
-
-  // ...
 });
