@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 import mongoose from 'mongoose';
 
 @Schema()
-export class ApiKey extends Document {
+export class ApiKey  {
   @Prop({ default: () => new mongoose.Types.ObjectId().toHexString() })
   _id: string;
 
@@ -20,4 +20,5 @@ export class ApiKey extends Document {
   password: string;
 }
 
+export type ApiKeyDocument = ApiKey & Document;
 export const ApiKeySchema = SchemaFactory.createForClass(ApiKey);
