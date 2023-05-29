@@ -26,6 +26,7 @@ export class SearchService {
       throw new BadRequestException(`${field} query is required`);
     }
 
+    /* Search logic for the endpoints states, lgas, regions */
     const results = await this.stateInfoModel
       .find({ [field]: new RegExp(query, 'i') }, projection)
       .exec();
@@ -44,7 +45,7 @@ export class SearchService {
   async findAll(params: FindAllParams) {
     let query = this.stateInfoModel.find();
 
-    /* Checks for filtering only for state region and lgas */
+    /* Implements for regex filtering only for state region and lgas */
     if (params.filter) {
       query = query.where({
         $or: [
@@ -55,13 +56,23 @@ export class SearchService {
       });
     }
 
-    // Check for sorting
+    /* Implements for filtering by population greater than a value */
+    if (params.populationGt) {
+      query = query.where({ population: { $gt: params.populationGt } });
+    }
+
+    /* Implements for filtering by population less than a value */
+    if (params.populationLt) {
+      query = query.where({ population: { $lt: params.populationLt } });
+    }
+
+    /* Implements for sorting */
     if (params.sortField && params.sortOrder) {
       const sortOrder = params.sortOrder === 'asc' ? 1 : -1;
       query = query.sort({ [params.sortField]: sortOrder });
     }
 
-    // Check for pagination and limits
+    /* Implements for pagination and limits */
     if (params.limit) {
       query = query.limit(params.limit);
       if (params.page) {
