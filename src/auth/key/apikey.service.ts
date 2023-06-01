@@ -11,15 +11,6 @@ export class ApiKeyService {
 
   async createApiKey(signupDto: SignupDto): Promise<ApiKey> {
     try {
-      const existingApiKey = await this.apiKeyModel.findOne({
-        email: signupDto.email,
-      });
-      if (existingApiKey) {
-        throw new Error(
-          'An account with this email already exists. Please login instead.',
-        );
-      }
-
       const salt = await bcrypt.genSalt();
       const hashedPassword = await bcrypt.hash(signupDto.password, salt);
       const createdApiKey = new this.apiKeyModel({
@@ -52,14 +43,6 @@ export class ApiKeyService {
   async findApiKeyByEmail(email: string): Promise<ApiKey> {
     try {
       return this.apiKeyModel.findOne({ email: email });
-    } catch (error) {
-      throw new NotFoundException('API key not found');
-    }
-  }
-
-  async findApiKeyByKey(key: string): Promise<ApiKey> {
-    try {
-      return this.apiKeyModel.findOne({ key: key });
     } catch (error) {
       throw new NotFoundException('API key not found');
     }
