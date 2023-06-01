@@ -1,7 +1,6 @@
-import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, SignupDto } from './dto';
-import { ApiKeyAuthGuard } from '../common';
+import { SignupDto } from './dto';
 
 @Controller('auth')
 export class AuthController {
@@ -14,12 +13,5 @@ export class AuthController {
       api_key: apiKey.key,
       message: 'Key can only be seen once: save key',
     };
-  }
-
-  @Post('login')
-  @UseGuards(ApiKeyAuthGuard)
-  async login(@Body() loginDto: LoginDto, @Req() req) {
-    const apiKey = await this.authService.login(loginDto, req.apiKey);
-    return { id: apiKey._id, message: 'Login Successful' };
   }
 }
