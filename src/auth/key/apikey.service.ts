@@ -34,7 +34,7 @@ export class ApiKeyService {
         password: hashedPassword,
       });
 
-      await client.set(signupDto.email, key, 'EX', 10); // Sets Key Expiration to 1 hour
+      await client.set(signupDto.email, key, 'EX', 3600); // Sets Key Expiration to 1 hour
 
       return createdApiKey.save();
     } catch (error) {
