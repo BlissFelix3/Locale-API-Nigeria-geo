@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, SignupDto } from './dto';
 import { ApiKeyAuthGuard } from '../common';
@@ -18,8 +18,8 @@ export class AuthController {
 
   @Post('login')
   @UseGuards(ApiKeyAuthGuard)
-  async login(@Body() loginDto: LoginDto) {
-    const apiKey = await this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginDto, @Req() req) {
+    const apiKey = await this.authService.login(loginDto, req.apiKey);
     return { id: apiKey._id, message: 'Login Successful' };
   }
 }
