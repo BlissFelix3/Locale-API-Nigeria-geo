@@ -11,7 +11,8 @@ export class AuthController {
     const apiKey = await this.authService.signup(signupDto);
     return {
       api_key: apiKey.key,
-      message: 'Key can only be seen once: save key',
+      message:
+        'Key can only be seen once and refreshes after an hour: save key',
     };
   }
 }
