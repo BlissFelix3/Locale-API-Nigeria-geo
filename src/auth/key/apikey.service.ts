@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { RedisService } from 'nestjs-redis';
 import { ApiKey } from './apikey.model';
 import { Model } from 'mongoose';
 import { SignupDto } from '../dto';
@@ -8,15 +7,11 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ApiKeyService {
-  constructor(
-    @InjectModel(ApiKey.name) private apiKeyModel: Model<ApiKey>,
-    private readonly redisService: RedisService,
-  ) {}
+  constructor(@InjectModel(ApiKey.name) private apiKeyModel: Model<ApiKey>) {}
 
   async createApiKey(signupDto: SignupDto): Promise<ApiKey> {
     try {
-      const client = this.redisService.getClient();
-      const existingApiKey = await client.exists(signupDto.email);
+      const existingApiKey = await this.findApiKeyByEmail(signupDto.email);
 
       if (existingApiKey) {
         throw new Error('Your initial API key has not expired yet');
@@ -32,9 +27,9 @@ export class ApiKeyService {
         name: signupDto.name,
         email: signupDto.email,
         password: hashedPassword,
+        created: Date.now(),
+        expires: Date.now() + 60 * 60 * 1000, // Implements key expiration timestamp 1 hour from now
       });
-
-      await client.set(signupDto.email, key, 'EX', 3600); // Sets Key Expiration to 1 hour
 
       return createdApiKey.save();
     } catch (error) {
@@ -43,17 +38,32 @@ export class ApiKeyService {
   }
 
   async validateApiKey(apiKey: string): Promise<boolean> {
-    const client = this.redisService.getClient();
-    // Validates only keys that exist in Redis (non-expired keys)
-    const exists = await client.exists(apiKey);
-    return exists === 1;
+    try {
+      const apiKeyData = await this.apiKeyModel.findOne({ key: apiKey });
+
+      // Validates only keys that are not expired
+      if (apiKeyData && apiKeyData.expires.getTime() > Date.now()) {
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      throw new NotFoundException('API key not found or expired');
+    }
   }
 
   async findApiKeyByEmail(email: string): Promise<ApiKey> {
     try {
-      return this.apiKeyModel.findOne({ email: email });
+      const apiKeyData = await this.apiKeyModel.findOne({ email: email });
+
+      // Only return keys that are not expired
+      if (apiKeyData && apiKeyData.expires.getTime() > Date.now()) {
+        return apiKeyData;
+      }
+
+      return null;
     } catch (error) {
-      throw new NotFoundException('API key not found');
+      throw new NotFoundException('API key not found or expired');
     }
   }
 
