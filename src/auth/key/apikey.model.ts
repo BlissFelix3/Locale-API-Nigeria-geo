@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 import mongoose from 'mongoose';
 
 @Schema()
-export class ApiKey  {
+export class ApiKey {
   @Prop({ default: () => new mongoose.Types.ObjectId().toHexString() })
   _id: string;
 
