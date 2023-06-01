@@ -3,10 +3,8 @@ import {
   NotFoundException,
   HttpException,
   HttpStatus,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { ApiKeyService } from './key';
-import { LoginDto } from './dto';
 import { SignupDto } from './dto';
 import { ApiKey } from './key';
 
@@ -39,25 +37,6 @@ export class AuthService {
       return apiKey;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  /* Functionality to login user */
-  async login(loginDto: LoginDto, apiKeyFromRequest: ApiKey): Promise<ApiKey> {
-    try {
-      const { email, password } = loginDto;
-
-      // Check if the API key matches the email
-      if (apiKeyFromRequest.email !== email) {
-        throw new UnauthorizedException('Invalid API key for this user');
-      }
-
-      // Validate the user's credentials
-      const apiKey = await this.validateUser(email, password);
-
-      return apiKey;
-    } catch (error) {
-      throw new UnauthorizedException(error.message);
     }
   }
 
