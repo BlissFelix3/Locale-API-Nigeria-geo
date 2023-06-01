@@ -18,6 +18,12 @@ export class ApiKey {
 
   @Prop({ required: true })
   password: string;
+
+  @Prop({ default: () => Date.now() })
+  created: Date;
+
+  @Prop({ default: () => Date.now() + 3600 * 1000 }) // expires after 1 hour
+  expires: Date;
 }
 
 export type ApiKeyDocument = ApiKey & Document;
