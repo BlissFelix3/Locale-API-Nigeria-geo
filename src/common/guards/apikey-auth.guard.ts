@@ -32,7 +32,7 @@ export class ApiKeyAuthGuard implements CanActivate {
         throw new UnauthorizedException('Invalid Api Key');
       }
 
-      request.apiKey = await this.apiKeyService.findApiKeyByEmail(apiKeyValue);
+      request.apiKey = await this.apiKeyService.findApiKeyByKey(apiKeyValue);
       return true;
     } catch (error) {
       throw new UnauthorizedException(error.message);
