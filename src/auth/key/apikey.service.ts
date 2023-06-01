@@ -4,6 +4,9 @@ import { ApiKey } from './apikey.model';
 import { Model } from 'mongoose';
 import { SignupDto } from '../dto';
 import * as bcrypt from 'bcrypt';
+import * as Redis from 'ioredis'; // To store key temporarily for expiration of 1 hour
+
+const redis = new Redis();
 
 @Injectable()
 export class ApiKeyService {
@@ -11,14 +14,25 @@ export class ApiKeyService {
 
   async createApiKey(signupDto: SignupDto): Promise<ApiKey> {
     try {
+      const existingApiKey = await redis.exists(signupDto.email);
+
+      if (existingApiKey) {
+        throw new Error('Your initial API key has not expired yet');
+      }
+
       const salt = await bcrypt.genSalt();
       const hashedPassword = await bcrypt.hash(signupDto.password, salt);
+      const key = await bcrypt.hash(`${signupDto.email}${Date.now()}`, salt);
+
+      // Saved to MongoDB
       const createdApiKey = new this.apiKeyModel({
-        key: await bcrypt.hash(`${signupDto.email}${Date.now()}`, salt),
+        key: key,
         name: signupDto.name,
         email: signupDto.email,
         password: hashedPassword,
       });
+
+      await redis.set(signupDto.email, key, 'EX', 3600); // Sets Key Expiration to 1 hour
 
       return createdApiKey.save();
     } catch (error) {
@@ -27,17 +41,9 @@ export class ApiKeyService {
   }
 
   async validateApiKey(apiKey: string): Promise<boolean> {
-    try {
-      const apiKeyInfo = await this.apiKeyModel.findOne({ key: apiKey });
-
-      if (apiKeyInfo) {
-        return true;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      throw new NotFoundException('API key validation failed');
-    }
+    // Validates only keys that exists in the redis(Non-expired keys)
+    const exists = await redis.exists(apiKey);
+    return exists === 1;
   }
 
   async findApiKeyByEmail(email: string): Promise<ApiKey> {
