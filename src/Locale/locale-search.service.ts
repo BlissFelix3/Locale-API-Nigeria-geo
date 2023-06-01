@@ -20,7 +20,7 @@ export class SearchService {
   private async findWithRegex(
     field: string,
     query: string,
-    projection: string = '',
+    projection = '',
   ): Promise<StateInfoDocument[]> {
     if (!query) {
       throw new BadRequestException(`${field} query is required`);
@@ -64,6 +64,39 @@ export class SearchService {
     /* Implements for filtering by population less than a value */
     if (params.populationLt) {
       query = query.where({ population: { $lt: params.populationLt } });
+    }
+
+    /* Implements exact match searches for strings */
+    const exactMatchFields = [
+      'capital',
+      'slogan',
+      'landmass',
+      'population',
+      'dialect',
+      'map',
+      'latitude',
+      'longitude',
+      'website',
+      'created_date',
+      'created_by',
+    ];
+    for (const field of exactMatchFields) {
+      if (params[field]) {
+        query = query.where({ [field]: params[field] });
+      }
+    }
+
+    /* Implements exact match searches for arrays */
+    const exactMatchArrayFields = [
+      'senatorial_districts',
+      'past_governors',
+      'borders',
+      'known_for',
+    ];
+    for (const field of exactMatchArrayFields) {
+      if (params[field]) {
+        query = query.where({ [field]: { $in: params[field] } });
+      }
     }
 
     /* Implements for sorting */
