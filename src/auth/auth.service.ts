@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  HttpException,
+  HttpStatus,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ApiKeyService } from './key';
 import { LoginDto } from './dto';
 import { SignupDto } from './dto';
@@ -15,7 +21,10 @@ export class AuthService {
       throw new NotFoundException('Invalid email or password');
     }
 
-    const isPasswordValid = await this.apiKeyService.comparePassword(apiKey, password);
+    const isPasswordValid = await this.apiKeyService.comparePassword(
+      apiKey,
+      password,
+    );
     if (!isPasswordValid) {
       throw new NotFoundException('Invalid email or password');
     }
@@ -23,23 +32,32 @@ export class AuthService {
     return apiKey;
   }
 
-   /* Registers user by creating an apiKey */
+  /* Registers user by creating an apiKey */
   async signup(signupDto: SignupDto): Promise<ApiKey> {
     try {
       const apiKey = await this.apiKeyService.createApiKey(signupDto);
       return apiKey;
     } catch (error) {
-      throw new Error('Failed to create API key');
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
   /* Functionality to login user */
-  async login(loginDto: LoginDto): Promise<ApiKey> {
+  async login(loginDto: LoginDto, apiKeyFromRequest: ApiKey): Promise<ApiKey> {
     try {
-      const apiKey = await this.validateUser(loginDto.email, loginDto.password);
+      const { email, password } = loginDto;
+
+      // Check if the API key matches the email
+      if (apiKeyFromRequest.email !== email) {
+        throw new UnauthorizedException('Invalid API key for this user');
+      }
+
+      // Validate the user's credentials
+      const apiKey = await this.validateUser(email, password);
+
       return apiKey;
     } catch (error) {
-      throw new NotFoundException('Invalid email or password');
+      throw new UnauthorizedException(error.message);
     }
   }
 
