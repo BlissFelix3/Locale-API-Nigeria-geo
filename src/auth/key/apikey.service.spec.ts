@@ -1,207 +1,130 @@
-// import { NotFoundException } from '@nestjs/common';
-// import { Model } from 'mongoose';
-// import { SignupDto } from '../dto';
-// import * as bcrypt from 'bcrypt';
-// import {ApiKey, ApiKeyDocument} from './apikey.model'
-// import {ApiKeyService} from './apikey.service'
+import { Test, TestingModule } from '@nestjs/testing';
+import { getModelToken } from '@nestjs/mongoose';
+import { ApiKeyService } from './apikey.service';
+import { ApiKey, ApiKeyDocument } from './apikey.model';
+import { Model } from 'mongoose';
+import * as bcrypt from 'bcrypt';
+import { SignupDto } from '../dto/signup.dto';
 
-// class MockApiKeyModel {
-//   public static findOne() {}
-//   public static findById() {}
-// }
+describe('ApiKeyService', () => {
+  let service: ApiKeyService;
+  let model: Model<ApiKeyDocument>;
 
-// describe('ApiKeyService', () => {
-//   let apiKeyService: ApiKeyService;
-//   let apiKeyModel: Model<ApiKeyDocument>;
+  const mockApiKeyModel = () => ({
+    findOne: jest.fn(),
+    save: jest.fn(),
+    create: jest.fn(),
+  });
 
-//   beforeEach(async () => {
-//     apiKeyModel = new MockApiKeyModel() as unknown as Model<ApiKeyDocument>;
-//     apiKeyService = new ApiKeyService(apiKeyModel);
-//   });
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        ApiKeyService,
+        { provide: getModelToken(ApiKey.name), useFactory: mockApiKeyModel },
+      ],
+    }).compile();
 
-//   describe('createApiKey', () => {
-//     it('should create and return a new API key', async () => {
-//       const signupDto: SignupDto = {
-//         name: 'Test User',
-//         email: 'test@example.com',
-//         password: 'password123',
-//       };
+    service = module.get<ApiKeyService>(ApiKeyService);
+    model = module.get<Model<ApiKeyDocument>>(getModelToken(ApiKey.name));
+  });
 
-//       const salt = await bcrypt.genSalt();
-//       const hashedPassword = await bcrypt.hash(signupDto.password, salt);
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
 
-//       const createdApiKey: ApiKeyDocument = {
-//         _id: '1',
-//         key: 'valid-api-key',
-//         name: signupDto.name,
-//         email: signupDto.email,
-//         password: hashedPassword,
-//         save: jest.fn(),
-//       } as unknown as ApiKeyDocument;
+  describe('createApiKey', () => {
+    it('should throw an error if there is an issue in saving the key', async () => {
+      (model.findOne as jest.Mock).mockResolvedValue(null);
+      (model.create as jest.Mock).mockImplementation(() => {
+        throw new Error('Issue in saving the key');
+      });
+      const signupDto: SignupDto = {
+        name: 'Test',
+        email: 'test@test.com',
+        password: 'password',
+      };
+      await expect(service.createApiKey(signupDto)).rejects.toThrow(
+        'Issue in saving the key',
+      );
+    });
 
-//       jest.spyOn(apiKeyModel.prototype, 'save').mockResolvedValueOnce(createdApiKey);
+    it('should create an API key', async () => {
+      (model.findOne as jest.Mock).mockResolvedValue(null);
+      jest.spyOn(bcrypt, 'genSalt').mockResolvedValue('salt');
+      jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedPassword');
+      const signupDto: SignupDto = {
+        name: 'Test',
+        email: 'test@test.com',
+        password: 'password',
+      };
+      const apiKey = {
+        key: 'hashedPassword',
+        name: signupDto.name,
+        email: signupDto.email,
+        password: 'hashedPassword',
+        created: expect.any(Date),
+        expires: expect.any(Date),
+        save: jest.fn().mockResolvedValue('apiKey'),
+      };
+      (model.create as jest.Mock).mockImplementation(() => apiKey);
+      expect(await service.createApiKey(signupDto)).toEqual(apiKey);
+    });
+  });
 
-//       const result = await apiKeyService.createApiKey(signupDto);
+  describe('validateApiKey', () => {
+    it('should return false if the API key has expired', async () => {
+      service['apiKeyModel'].findOne = jest
+        .fn()
+        .mockResolvedValue({ expires: new Date(Date.now() - 10000) });
+      await expect(service.validateApiKey('expiredKey')).resolves.toBe(false);
+    });
 
-//       expect(apiKeyModel.prototype.save).toHaveBeenCalledTimes(1);
-//       expect(result).toEqual(createdApiKey);
-//     });
+    it('should return false for an expired API key', async () => {
+      service['apiKeyModel'].findOne = jest
+        .fn()
+        .mockResolvedValue({ expires: new Date(Date.now() - 10000) });
+      expect(await service.validateApiKey('expiredKey')).toBe(false);
+    });
+  });
 
-//     it('should throw an error if failed to create API key', async () => {
-//       const signupDto: SignupDto = {
-//         name: 'Test User',
-//         email: 'test@example.com',
-//         password: 'password123',
-//       };
+  describe('findApiKeyByEmail', () => {
+    it('should return null if the API key has expired', async () => {
+      service['apiKeyModel'].findOne = jest
+        .fn()
+        .mockResolvedValue({ expires: new Date(Date.now() - 10000) });
+      await expect(
+        service.findApiKeyByEmail('test@test.com'),
+      ).resolves.toBeNull();
+    });
 
-//       jest.spyOn(bcrypt, 'genSalt').mockRejectedValueOnce(new Error('Failed to generate salt'));
+    it('should return null for an expired API key', async () => {
+      service['apiKeyModel'].findOne = jest
+        .fn()
+        .mockResolvedValue({ expires: new Date(Date.now() - 10000) });
+      expect(await service.findApiKeyByEmail('test@test.com')).toBeNull();
+    });
+  });
 
-//       await expect(apiKeyService.createApiKey(signupDto)).rejects.toThrowError('Failed to create API key');
-//       expect(bcrypt.genSalt).toHaveBeenCalledTimes(1);
-//     });
-//   });
+  describe('findById', () => {
+    it('should throw a NotFoundException if no API key with the specified id is found', async () => {
+      service['apiKeyModel'].findById = jest.fn().mockResolvedValue(null);
+      await expect(service.findById('invalidId')).rejects.toThrow(
+        `No key with id invalidId`,
+      );
+    });
+  });
 
-//   describe('validateApiKey', () => {
-//     it('should return true when the API key is found', async () => {
-//       const apiKey = 'valid-api-key';
-
-//       jest.spyOn(apiKeyModel, 'findOne').mockResolvedValueOnce({} as ApiKeyDocument);
-
-//       const result = await apiKeyService.validateApiKey(apiKey);
-
-//       expect(apiKeyModel.findOne).toHaveBeenCalledTimes(1);
-//       expect(result).toBe(true);
-//     });
-
-//     it('should return false when the API key is not found', async () => {
-//       const apiKey = 'invalid-api-key';
-
-//       jest.spyOn(apiKeyModel, 'findOne').mockResolvedValueOnce(null);
-
-//       const result = await apiKeyService.validateApiKey(apiKey);
-
-//       expect(apiKeyModel.findOne).toHaveBeenCalledTimes(1);
-//       expect(result).toBe(false);
-//     });
-
-//     it('should throw a NotFoundException when API key validation fails', async () => {
-//       const apiKey = 'invalid-api-key';
-
-//       jest.spyOn(apiKeyModel, 'findOne').mockRejectedValueOnce(new Error('Validation error'));
-
-//       await expect(apiKeyService.validateApiKey(apiKey)).rejects.toThrowError(NotFoundException);
-//       expect(apiKeyModel.findOne).toHaveBeenCalledTimes(1);
-//     });
-//   });
-
-//   describe('findApiKeyByEmail', () => {
-//     it('should return the API key with the given email', async () => {
-//       const email = 'test@example.com';
-
-//       const existingApiKey: ApiKeyDocument = {
-//         _id: '1',
-//         key: 'valid-api-key',
-//         name: 'Test User',
-//         email: email,
-//         password: 'hashed-password',
-//       } as unknown as ApiKeyDocument;
-
-//       jest.spyOn(apiKeyModel, 'findOne').mockResolvedValueOnce(existingApiKey);
-
-//       const result = await apiKeyService.findApiKeyByEmail(email);
-
-//       expect(apiKeyModel.findOne).toHaveBeenCalledTimes(1);
-//       expect(result).toEqual(existingApiKey);
-//     });
-
-//     it('should throw a NotFoundException when API key with the email is not found', async () => {
-//       const email = 'nonexistent@example.com';
-
-//       jest.spyOn(apiKeyModel, 'findOne').mockResolvedValueOnce(null);
-
-//       await expect(apiKeyService.findApiKeyByEmail(email)).rejects.toThrowError(NotFoundException);
-//       expect(apiKeyModel.findOne).toHaveBeenCalledTimes(1);
-//     });
-//   });
-
-//   describe('findById', () => {
-//     it('should return the API key with the given ID', async () => {
-//       const id = '1';
-
-//       const existingApiKey: ApiKeyDocument = {
-//         _id: id,
-//         key: 'valid-api-key',
-//         name: 'Test User',
-//         email: 'test@example.com',
-//         password: 'hashed-password',
-//       } as unknown as ApiKeyDocument;
-
-//       jest.spyOn(apiKeyModel, 'findById').mockResolvedValueOnce(existingApiKey);
-
-//       const result = await apiKeyService.findById(id);
-
-//       expect(apiKeyModel.findById).toHaveBeenCalledTimes(1);
-//       expect(result).toEqual(existingApiKey);
-//     });
-
-//     it('should throw a NotFoundException when no key with the ID is found', async () => {
-//       const id = 'nonexistent-id';
-
-//       jest.spyOn(apiKeyModel, 'findById').mockResolvedValueOnce(null);
-
-//       await expect(apiKeyService.findById(id)).rejects.toThrowError(NotFoundException);
-//       expect(apiKeyModel.findById).toHaveBeenCalledTimes(1);
-//     });
-//   });
-
-//   describe('comparePassword', () => {
-//     it('should return true when the password matches', async () => {
-//       const apiKey: ApiKeyDocument = {
-//         _id: '1',
-//         key: 'valid-api-key',
-//         name: 'Test User',
-//         email: 'test@example.com',
-//         password: await bcrypt.hash('password123', 10),
-//       } as unknown as ApiKeyDocument;
-
-//       jest.spyOn(bcrypt, 'compare').mockResolvedValueOnce(true);
-
-//       const result = await apiKeyService.comparePassword(apiKey, 'password123');
-
-//       expect(bcrypt.compare).toHaveBeenCalledTimes(1);
-//       expect(result).toBe(true);
-//     });
-
-//     it('should return false when the password does not match', async () => {
-//       const apiKey: ApiKeyDocument = {
-//         _id: '1',
-//         key: 'valid-api-key',
-//         name: 'Test User',
-//         email: 'test@example.com',
-//         password: await bcrypt.hash('password123', 10),
-//       } as unknown as ApiKeyDocument;
-
-//       jest.spyOn(bcrypt, 'compare').mockResolvedValueOnce(false);
-
-//       const result = await apiKeyService.comparePassword(apiKey, 'wrong-password');
-
-//       expect(bcrypt.compare).toHaveBeenCalledTimes(1);
-//       expect(result).toBe(false);
-//     });
-
-//     it('should throw an error if failed to compare passwords', async () => {
-//       const apiKey: ApiKeyDocument = {
-//         _id: '1',
-//         key: 'valid-api-key',
-//         name: 'Test User',
-//         email: 'test@example.com',
-//         password: 'hashed-password',
-//       } as unknown as ApiKeyDocument;
-
-//       jest.spyOn(bcrypt, 'compare').mockRejectedValueOnce(new Error('Comparison error'));
-
-//       await expect(apiKeyService.comparePassword(apiKey, 'password123')).rejects.toThrowError('Failed to compare passwords');
-//       expect(bcrypt.compare).toHaveBeenCalledTimes(1);
-//     });
-//   });
-// });
+  describe('comparePassword', () => {
+    it('should throw an error if bcrypt.compare fails', async () => {
+      jest.spyOn(bcrypt, 'compare').mockImplementation(() => {
+        throw new Error('Failed to compare passwords');
+      });
+      await expect(
+        service.comparePassword(
+          { password: 'hashedPassword' } as any,
+          'password',
+        ),
+      ).rejects.toThrow('Failed to compare passwords');
+    });
+  });
+});
