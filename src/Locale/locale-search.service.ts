@@ -155,4 +155,8 @@ export class SearchService {
   async searchStatesInRegion(region: string) {
     return this.findWithRegex('region', region, 'state');
   }
+
+  protected async execute(query) {
+    return query.exec();
+  }
 }

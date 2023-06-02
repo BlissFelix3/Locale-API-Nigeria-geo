@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SearchController } from './locale-search.controller';
 import { SearchService } from './locale-search.service';
 import { FindAllParams } from './dto';
-import { NotFoundException, BadRequestException } from '@nestjs/common';
-import {ApiKeyService} from '../auth'
-import {ApiKeyAuthGuard} from '../auth'
+import { NotFoundException } from '@nestjs/common';
+import { ApiKeyService } from '../auth';
+import { ApiKeyAuthGuard } from '../auth';
 
 describe('SearchController', () => {
   let controller: SearchController;
@@ -66,6 +66,22 @@ describe('SearchController', () => {
         sortField: 'state',
         sortOrder: 'asc',
         filter: 'test',
+        populationGt: 100000,
+        populationLt: 2000000,
+        capital: 'Test Capital',
+        slogan: 'Test Slogan',
+        landmass: 'Test Landmass',
+        dialect: 'Test Dialect',
+        map: 'Test Map',
+        created_date: '2023-06-02',
+        created_by: 'Test User',
+        latitude: '1.000',
+        longitude: '1.000',
+        website: 'www.test.com',
+        senatorialDistricts: ['Test District 1', 'Test District 2'],
+        past_governors: ['Test Governor 1', 'Test Governor 2'],
+        borders: ['Test Border 1', 'Test Border 2'],
+        known_for: ['Test Known For 1', 'Test Known For 2'],
       };
       jest.spyOn(service, 'findAll').mockResolvedValue(result);
       expect(await controller.findAll(params)).toBe(result);
@@ -78,6 +94,22 @@ describe('SearchController', () => {
         sortField: 'state',
         sortOrder: 'asc',
         filter: 'test',
+        populationGt: 100000,
+        populationLt: 2000000,
+        capital: 'Test Capital',
+        slogan: 'Test Slogan',
+        landmass: 'Test Landmass',
+        dialect: 'Test Dialect',
+        map: 'Test Map',
+        created_date: '2023-06-02',
+        created_by: 'Test User',
+        latitude: '1.000',
+        longitude: '1.000',
+        website: 'www.test.com',
+        senatorialDistricts: ['Test District 1', 'Test District 2'],
+        past_governors: ['Test Governor 1', 'Test Governor 2'],
+        borders: ['Test Border 1', 'Test Border 2'],
+        known_for: ['Test Known For 1', 'Test Known For 2'],
       };
       jest.spyOn(service, 'findAll').mockImplementation(() => {
         throw new NotFoundException();
