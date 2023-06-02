@@ -48,7 +48,7 @@ export class ApiKeyService {
 
       return false;
     } catch (error) {
-      throw new NotFoundException('API key not found or expired');
+      throw new NotFoundException('Api Key Not Found Or Expired: Get New Key');
     }
   }
 
