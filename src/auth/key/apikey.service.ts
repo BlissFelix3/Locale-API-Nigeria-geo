@@ -22,16 +22,14 @@ export class ApiKeyService {
       const key = await bcrypt.hash(`${signupDto.email}${Date.now()}`, salt);
 
       // Saved to MongoDB
-      const createdApiKey = new this.apiKeyModel({
-        key: key,
+      return this.apiKeyModel.create({
+        key,
         name: signupDto.name,
         email: signupDto.email,
         password: hashedPassword,
         created: Date.now(),
         expires: Date.now() + 60 * 60 * 1000, // Implements key expiration timestamp 1 hour from now
       });
-
-      return createdApiKey.save();
     } catch (error) {
       throw new Error(error.message);
     }
