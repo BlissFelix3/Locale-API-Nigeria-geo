@@ -16,7 +16,7 @@ export class DataImportService {
     // Delete all documents
     await this.stateInfoModel.deleteMany({});
 
-    // Read and parse the JSON file
+    // Reading and parsing the JSON file
     const data = fs.readFileSync(
       path.resolve(__dirname, './data.json'),
       'utf-8',
@@ -24,7 +24,7 @@ export class DataImportService {
 
     const jsonData = JSON.parse(data);
 
-    // Save each item in the JSON data
+    // Saving each item in the JSON data
     for (const item of jsonData) {
       const stateInfo = new this.stateInfoModel(item);
       await stateInfo.save();
