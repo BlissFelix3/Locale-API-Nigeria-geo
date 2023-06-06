@@ -14,8 +14,8 @@ export class CleanupService {
   }
 
   scheduleCleanup() {
-    cron.schedule('0 */2 * * *', async () => {
-      // This will run every 2 hours.
+    cron.schedule('*/30 * * * *', async () => {
+      // This will run every 30 minutes.
       console.log('Running cleanup...');
       await this.cleanup();
     });
