@@ -25,6 +25,20 @@ export class SearchController {
   @ApiOperation({ summary: 'Find all locales' })
   @ApiQuery({ name: 'name', required: false })
   @ApiQuery({ name: 'email', required: false })
+  @ApiQuery({
+    name: 'past_governors',
+    required: false,
+    type: String,
+    isArray: true,
+  })
+  @ApiQuery({ name: 'borders', required: false, type: String, isArray: true })
+  @ApiQuery({ name: 'known_for', required: false, type: String, isArray: true })
+  @ApiQuery({
+    name: 'senatorialDistricts',
+    required: false,
+    type: String,
+    isArray: true,
+  })
   @ApiBearerAuth()
   async findAll(@Query(ValidationPipe) params: FindAllParams) {
     try {
