@@ -29,9 +29,7 @@ export class ApiKeyAuthGuard implements CanActivate {
       const isValid = await this.apiKeyService.validateApiKey(apiKeyValue);
 
       if (!isValid) {
-        throw new UnauthorizedException(
-          'Api Key Not Found Or Expired: Get New Key',
-        );
+        throw new UnauthorizedException('Api Key Is Invalid');
       }
 
       request.apiKey = await this.apiKeyService.findApiKeyByEmail(apiKeyValue);
