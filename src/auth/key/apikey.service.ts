@@ -14,7 +14,15 @@ export class ApiKeyService {
       const existingApiKey = await this.findApiKeyByEmail(signupDto.email);
 
       if (existingApiKey) {
-        throw new Error('Your initial API key has not expired yet');
+        const now = Date.now();
+        const expiresIn = existingApiKey.expires.getTime() - now; // get the remaining time in milliseconds
+
+        if (expiresIn > 0) {
+          const minutes = Math.round(expiresIn / (60 * 1000)); // convert to minutes
+          throw new Error(
+            `Your initial API key has not expired yet. Please wait for ${minutes} minute(s)`,
+          );
+        }
       }
 
       const salt = await bcrypt.genSalt();
