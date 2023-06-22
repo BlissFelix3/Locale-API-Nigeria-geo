@@ -15,18 +15,12 @@ export class AuthService {
   /* Validates User by Email and Password */
   async validateUser(email: string, password: string): Promise<ApiKey> {
     const apiKey = await this.apiKeyService.findApiKeyByEmail(email);
-    if (!apiKey) {
+    if (
+      !apiKey ||
+      !(await this.apiKeyService.comparePassword(apiKey, password))
+    ) {
       throw new NotFoundException('Invalid email or password');
     }
-
-    const isPasswordValid = await this.apiKeyService.comparePassword(
-      apiKey,
-      password,
-    );
-    if (!isPasswordValid) {
-      throw new NotFoundException('Invalid email or password');
-    }
-
     return apiKey;
   }
 
