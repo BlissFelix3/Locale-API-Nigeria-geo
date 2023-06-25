@@ -4,7 +4,7 @@ import { StateInfo, StateInfoSchema } from './locale-info.schema';
 import { DataImportService } from '../common';
 import { SearchService } from './locale-search.service';
 import { SearchController } from './locale-search.controller';
-import { AuthModule } from 'auth';
+import { AuthModule } from '../auth';
 
 @Module({
   imports: [
