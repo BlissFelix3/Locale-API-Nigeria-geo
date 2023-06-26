@@ -1,6 +1,6 @@
 # Locale API
 
-This is an Locale Application built using Node.js Nest framework, which provides geographical, specifically for regions, states and local governments but includee several other metadats.
+This is an Locale Application built using Node.js Nest framework, which provides geographical, specifically for regions, states and local governments but includes several other metadatas.
 
 This API uses a database of location data and a caching mechanism for better performance. You will need an API key for authorization. The API endpoints and functionality can be found below.
 
@@ -33,27 +33,17 @@ $ npm install
 ## Running the app
 
 ```bash
-# development
-$ npm run start
 
-# watch mode
 $ npm run start:dev
 
-# production mode
-$ npm run start:prod
 ```
 
 ## Test
 
 ```bash
-# unit tests
+
 $ npm run test
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
 ```
 
 ### Prerequisites
@@ -62,6 +52,146 @@ $ npm run test:cov
 - Nest CLI: Install it by running `npm install -g @nestjs/cli`.
 - MongoDB: Follow this guide to install and setup MongoDB: [MongoDB Tutorial](https://docs.mongodb.com/manual/installation)
 - Redis: Follow this guide to install Redis: [Redis Installation Guide](https://redis.io/download)
+
+## Endpoints
+The API will be accessible at `http://localhost:3000/` or `https://locale-api.onrender.com/api`.
+
+### GET /search/all
+
+Retrieve all state information.
+
+**Parameters:**
+
+- `page` (optional): Page number for pagination (default: 1).
+- `limit` (optional): Number of results per page (default: 10).
+- `sortField` (optional): Field to sort the results by.
+- `sortOrder` (optional): Sort order (`asc` or `desc`).
+- `filter` (optional): Filter the results by state, region, or LGAs.
+- `populationGt` (optional): Filter the results by population greater than a value.
+- `populationLt` (optional): Filter the results by population less than a value.
+- `capital` (optional): Filter the results by exact match on the capital field.
+- `slogan` (optional): Filter the results by exact match on the slogan field.
+- `landmass` (optional): Filter the results by exact match on the landmass field.
+- `dialect` (optional): Filter the results by exact match on the dialect field.
+- `map` (optional): Filter the results by exact match on the map field.
+- `latitude` (optional): Filter the results by exact match on the latitude field.
+- `longitude` (optional): Filter the results by exact match on the longitude field.
+- `website` (optional): Filter the results by exact match on the website field.
+- `created_date` (optional): Filter the results by exact match on the created_date field.
+- `created_by` (optional): Filter the results by exact match on the created_by field.
+- `senatorial_districts` (optional): Filter the results by exact match on the senatorial_districts field (supports multiple values).
+- `past_governors` (optional): Filter the results by exact match on the past_governors field (supports multiple values).
+- `borders` (optional): Filter the results by exact match on the borders field (supports multiple values).
+- `known_for` (optional): Filter the results by exact match on the known_for field (supports multiple values).
+
+**Filter Samples For Postman:**
+
+1. ##### No parameters: Get All Information
+###### Request Type: GET
+- URL: http://base_url/search/all
+
+2. ##### Filtering with filter parameter: This filter only applies to state, region and lgas names.
+###### Request Type: GET
+URL: http://base_url/search/all?filter=states/regions/lgas
+
+3. ##### Filtering with populationGt and populationLt parameters: These filters apply to the population field.
+###### Request Type: GET
+- URL: http://base_url/search/all?populationGt=1000000&populationLt=5000000(Don't go below the overall population minium no. 1,704,515)
+
+4. ##### Exact match on a single field: This tests exact match filtering on one field, such as capital.
+###### Request Type: GET
+- URL: http://base_url/search/all?capital=Ikeja
+
+5. ##### Exact match on multiple fields: This tests exact match filtering on multiple fields.
+###### Request Type: GET
+- URL: http://your_base_url/search/all?capital=Abuja&slogan=Unity%20and%20Faith
+
+6. ##### Exact match on an array field: This tests exact match filtering on an array field, such as senatorial_districts.
+###### Request Type: GET
+URL: http://base_url/search/all?past_governors=Babatunde%20Fashola&past_governors=Bola%20Tinubu(On swagger add two string items)
+`Or`
+###### Request Type: GET
+URL: http://base_url/search/all?past_governors[]=Babatunde%20Fashola(If you want to search for just one info in the array/. Works for Postman only)
+
+- `Do for other array fields e.g borders, knownfor etc`
+
+7. ##### Sorting with sortField and sortOrder: These control the order of the results.
+###### Request Type: GET
+URL: http://base_url/search/all?sortField=state&sortOrder=asc
+
+8. ##### Using page and limit parameters: These control pagination and the number of results per page.
+###### Request Type: GET
+URL: http://base_url/search/all?page=1&limit=10
+
+**Response:**
+
+- Status: 200 OK
+- Body: Array of state information objects.
+
+### GET /search/state/:query
+
+Search for states by state name.
+
+**Parameters:**
+
+- `query`: The query string to search for.
+
+**Response:**
+
+- Status: 200 OK
+- Body: Array of state information objects matching the search query.
+
+### GET /search/lga/:query
+
+Search for LGAs (Local Government Areas) by LGA name.
+
+**Parameters:**
+
+- `query`: The query string to search for.
+
+**Response:**
+
+- Status: 200 OK
+- Body: Array of state information objects containing LGAs matching the search query.
+
+### GET /search/region/:query
+
+Search for regions by region name.
+
+**Parameters:**
+
+- `query`: The query string to search for.
+
+**Response:**
+
+- Status: 200 OK
+- Body: Array of state information objects matching the search query.
+
+### GET /search/state/lgas
+
+Retrieve LGAs (Local Government Areas) for a specific state.
+
+**Parameters:**
+
+- `state`: The state name.
+
+**Response:**
+
+- Status: 200 OK
+- Body: JSON of LGAs for the specified state.
+
+### GET /search/region/states
+
+Retrieve States for a specific region.
+
+**Parameters:**
+
+- `region`: The region name.
+
+**Response:**
+
+- Status: 200 OK
+- Body: JSON of states for the specified region.
 
 ## License
 
