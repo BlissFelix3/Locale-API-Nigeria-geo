@@ -56,6 +56,44 @@ $ npm run test
 ## Endpoints
 The API will be accessible at `http://localhost:3000/` or `https://locale-api.onrender.com/api`.
 
+### Signup User
+
+- Route: auth/signup
+- Method: POST
+- Body:
+
+```
+{
+    "username": "John Does",
+    "email": "john@gmail.com",
+    "password": "password23",
+
+}
+
+```
+
+- Responses
+
+Success
+
+```javascript
+{
+    "api_key" : " generated key"
+    "message": "Key can only be generated once and refreshes after an hour: save key"
+}
+```
+
+- Response statusCodes
+
+```javascript
+  - 201: success || Created
+  - 409: error || Conflict Error
+  - 400: error || Bad Request
+  - 500: error || Internal Server Error
+```
+
+---
+
 ### GET /search/all
 
 Retrieve all state information.
