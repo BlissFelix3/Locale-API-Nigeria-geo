@@ -49,7 +49,7 @@ describe('SearchService', () => {
       latitude: '1.000',
       longitude: '1.000',
       website: 'www.test.com',
-      senatorialDistricts: ['Test District 1', 'Test District 2'],
+      senatorial_districts: ['Test District 1', 'Test District 2'],
       past_governors: ['Test Governor 1', 'Test Governor 2'],
       borders: ['Test Border 1', 'Test Border 2'],
       known_for: ['Test Known For 1', 'Test Known For 2'],
@@ -69,7 +69,7 @@ describe('SearchService', () => {
       const result = await searchService.findAll(findAllParams);
 
       expect(stateInfoModel.find).toHaveBeenCalled();
-      expect(findMock.where).toHaveBeenCalledTimes(16);
+      expect(findMock.where).toHaveBeenCalledTimes(17);
       expect(findMock.sort).toHaveBeenCalledWith({ state: 1 });
       expect(findMock.limit).toHaveBeenCalledWith(findAllParams.limit);
       expect(findMock.skip).toHaveBeenCalledWith(
