@@ -34,7 +34,7 @@ export class SearchController {
   @ApiQuery({ name: 'borders', required: false, type: String, isArray: true })
   @ApiQuery({ name: 'known_for', required: false, type: String, isArray: true })
   @ApiQuery({
-    name: 'senatorialDistricts',
+    name: 'senatorial_districts',
     required: false,
     type: String,
     isArray: true,
