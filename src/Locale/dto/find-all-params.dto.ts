@@ -129,5 +129,5 @@ export class FindAllParams {
   })
   @IsArray({ message: 'Senatorial Districts must be an array of strings' })
   @IsOptional()
-  senatorialDistricts: string[];
+  senatorial_districts: string[];
 }
